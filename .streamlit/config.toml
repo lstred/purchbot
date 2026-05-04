@@ -1,0 +1,7 @@
+# Streamlit app defaults
+# Force light theme and disable theme switching persistence
+[theme]
+base = "light"
+
+# Optional: ensure the app always starts in wide mode is controlled in code via st.set_page_config
+# (There is no config.toml key for layout.)

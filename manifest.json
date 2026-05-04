@@ -1,0 +1,146 @@
+﻿{
+    "generatedAt":  "2025-11-07T08:37:32",
+    "hashAlgorithm":  "SHA256",
+    "files":  [
+                  {
+                      "path":  ".\\app\\__init__.py",
+                      "sha256":  "F1945CD6C19E56B3C1C78943EF5EC18116907A4CA1EFC40A57D48AB1DB7ADFC5",
+                      "size":  3
+                  },
+                  {
+                      "path":  ".\\app\\config.py",
+                      "sha256":  "D0A00A709880A7B649370436B87FC4BC38B9A2B32730D7EBD8DF623EBAD441DF",
+                      "size":  2673
+                  },
+                  {
+                      "path":  ".\\app\\data\\__init__.py",
+                      "sha256":  "F1945CD6C19E56B3C1C78943EF5EC18116907A4CA1EFC40A57D48AB1DB7ADFC5",
+                      "size":  3
+                  },
+                  {
+                      "path":  ".\\app\\data\\backorder_store.py",
+                      "sha256":  "F6602C0D0AD14CC8F0CFEF497950824BF02B045DB5551EECE2DF0D01FA2D347F",
+                      "size":  7135
+                  },
+                  {
+                      "path":  ".\\app\\data\\db.py",
+                      "sha256":  "D80AA7B72C4A5CDD4D0DC04EB133EBE9D3E314EBB2DC1F929BD184F2C5E11C52",
+                      "size":  2000
+                  },
+                  {
+                      "path":  ".\\app\\data\\history_store.py",
+                      "sha256":  "E80AEBAF9FBCE42B260E1B01E6A1326AB89AC5EECAAE3F95E39E1BAB5483031F",
+                      "size":  4951
+                  },
+                  {
+                      "path":  ".\\app\\data\\launch_store.py",
+                      "sha256":  "36C30C4025949EC36F99D609623B5C28013BB5108457AFDC13263CC8F604A9FD",
+                      "size":  4239
+                  },
+                  {
+                      "path":  ".\\app\\data\\loaders.py",
+                      "sha256":  "98433022E20EC920E06B69A8C50147B03887BED26FE9171F8029908FB48C9555",
+                      "size":  17954
+                  },
+                  {
+                      "path":  ".\\app\\data\\queries.py",
+                      "sha256":  "CE26742C13E4CEE29F53EFB817335923F7EBA47943E5E87F6223B897C8153FB1",
+                      "size":  7968
+                  },
+                  {
+                      "path":  ".\\app\\data\\seasonality_store.py",
+                      "sha256":  "46C5A700B37CC8A067FBCC1493B9B36953A0D400C7AE6842D2376B0CE3FBC184",
+                      "size":  2490
+                  },
+                  {
+                      "path":  ".\\app\\data\\stockturn_store.py",
+                      "sha256":  "FB3312DE24E6E902DBC1AF6BF93C81F1EA780CF3F18B885FBAD5D3C3E44AE8BF",
+                      "size":  1451
+                  },
+                  {
+                      "path":  ".\\app\\services\\__init__.py",
+                      "sha256":  "F1945CD6C19E56B3C1C78943EF5EC18116907A4CA1EFC40A57D48AB1DB7ADFC5",
+                      "size":  3
+                  },
+                  {
+                      "path":  ".\\app\\services\\alerts.py",
+                      "sha256":  "AF23B9269818D2202F9BC561918AB5F2DEB6DAEB1B66CC6E54A34BFDDB6350E3",
+                      "size":  1847
+                  },
+                  {
+                      "path":  ".\\app\\services\\metrics_service.py",
+                      "sha256":  "C14221E1D24B315296E1B6FE26BE6AE2FA225B5F05FDF8771241EBCFB62D0198",
+                      "size":  58551
+                  },
+                  {
+                      "path":  ".\\app\\services\\reorder.py",
+                      "sha256":  "EF28612EEA515CDDD13A373A9E359370C4FBC2CC0EDDE726B34A5D2E140F34A6",
+                      "size":  870
+                  },
+                  {
+                      "path":  ".\\app\\services\\sku_rating.py",
+                      "sha256":  "70C9DB5985DEB13003E5ABA6A3FBE919216188257D4030C4024A2E5A1E8DACBF",
+                      "size":  2005
+                  },
+                  {
+                      "path":  ".\\app\\ui\\__init__.py",
+                      "sha256":  "F1945CD6C19E56B3C1C78943EF5EC18116907A4CA1EFC40A57D48AB1DB7ADFC5",
+                      "size":  3
+                  },
+                  {
+                      "path":  ".\\app\\ui\\dashboard.py",
+                      "sha256":  "BB10533FC11A481AE8394C10143A6EEB47BED6EF2538848386E3575B330C61E1",
+                      "size":  282552
+                  },
+                  {
+                      "path":  ".\\bootstrap.ps1",
+                      "sha256":  "04A65BB4CAA78D71AB1D57CBDAB2905206D0441496C5343DDD79C7992560708B",
+                      "size":  6534
+                  },
+                  {
+                      "path":  ".\\config_local.py",
+                      "sha256":  "B20E26661C6522376AA5E7495820ECAB8E563D9B65F45EFA7039D9EBD48085D8",
+                      "size":  654
+                  },
+                  {
+                      "path":  ".\\config_local.sample.py",
+                      "sha256":  "ED95D5F565DFC383E115CC1E05E1DB1799DDB1B7E40877A69D5F738332AA4B8A",
+                      "size":  586
+                  },
+                  {
+                      "path":  ".\\docker-runner.ps1",
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+                      "size":  0
+                  },
+                  {
+                      "path":  ".\\launch_app.py",
+                      "sha256":  "D770E7CC5A813E8871926E3663D1A503F87F982F58D2FB8A015FF07BBFF7343A",
+                      "size":  3998
+                  },
+                  {
+                      "path":  ".\\README.md",
+                      "sha256":  "502EF81593F1CEA275C2E83474A87D5864CA1F3305AA78CD9BA190B4F2684F2F",
+                      "size":  8449
+                  },
+                  {
+                      "path":  ".\\requirements.lock.txt",
+                      "sha256":  "C1FEEFD304214443AEC71F485EB5238348B772059FE6E3F0192F33CA7707E486",
+                      "size":  1027
+                  },
+                  {
+                      "path":  ".\\requirements.txt",
+                      "sha256":  "91ED6FE374C13C6F3C990341A41F635C5BF61DCC1EAF704BC46A6315EC89FE9D",
+                      "size":  170
+                  },
+                  {
+                      "path":  ".\\run-dashboard.bat",
+                      "sha256":  "BD4E7F95FE2A24A52A286FE217F2B8D0805250BB036CD674661E86F51F00B8D9",
+                      "size":  217
+                  },
+                  {
+                      "path":  ".\\streamlit_app.py",
+                      "sha256":  "D88B178AC985FB5C6F1663EE1E3784765CAAD413E56E97FF47B5BB77C81F2C89",
+                      "size":  2216
+                  }
+              ]
+}

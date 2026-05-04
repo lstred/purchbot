@@ -1,0 +1,16 @@
+﻿__pycache__/
+.env
+config_local.py
+.venv/
+*.pyc
+streamlit.log
+history/
+debug_output.txt
+app/data/backorder_history.csv
+build/
+dist/
+dist_portable/
+*.bak
+*.bak2
+*.exe
+*.zip
