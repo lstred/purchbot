@@ -393,9 +393,22 @@ def load_itemstks(connection_string: str) -> pd.DataFrame:
     if "sku" in df.columns:
         df["sku"] = df["sku"].astype(str).str.strip()
     df["jstock"] = pd.to_numeric(df.get("jstock"), errors="coerce").fillna(0.0)
-    df = df[[c for c in ["sku", "jstock"] if c in df.columns]].copy()
+    if "jfill2" in df.columns:
+        df["jfill2"] = df["jfill2"].fillna("").astype(str).str.strip().str.upper()
+    df = df[[c for c in ["sku", "jstock", "jfill2"] if c in df.columns]].copy()
     if not df.empty:
-        df = df.groupby("sku", as_index=False)["jstock"].max()
+        jstock_agg = df.groupby("sku", as_index=False)["jstock"].max()
+        if "jfill2" in df.columns:
+            # If any row for a SKU has JFILL2='N', the whole SKU is treated as excluded
+            jfill2_agg = (
+                df.groupby("sku")["jfill2"]
+                .apply(lambda x: "N" if (x == "N").any() else (x.iloc[0] if len(x) > 0 else ""))
+                .reset_index()
+            )
+            jfill2_agg.columns = ["sku", "jfill2"]
+            df = jstock_agg.merge(jfill2_agg, on="sku", how="left")
+        else:
+            df = jstock_agg
     return df
 
 

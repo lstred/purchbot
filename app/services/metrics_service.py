@@ -1098,6 +1098,34 @@ def compute_dashboard_data(filters: MetricsFilters) -> Dict[str, object]:
     # Do not filter out SKUs not present in items; keep any SKU that appears in sales/rolls/POs
     tmark("coverage_reorder")
 
+    # --- Exclude dropped / non-replenishable items from Overview and Stock Turn ---
+    # Criteria:
+    #   1) ITEM.IPOL1, IPOL2, or IPOL3 = 'DI'  (dropped-item policy flag)
+    #   2) ITEMSTK.JFILL2 = 'N'                 (excluded from replenishment)
+    try:
+        excluded_skus: set = set()
+        # IPOL1/2/3 = 'DI' — use base_sku so alias items are also excluded
+        if not items.empty:
+            base_col = "base_sku" if "base_sku" in items.columns else "sku"
+            for pol_col in ["ipol1", "ipol2", "ipol3"]:
+                if pol_col in items.columns:
+                    pol_vals = items[pol_col].fillna("").astype(str).str.strip().str.upper()
+                    excluded_skus |= set(items.loc[pol_vals == "DI", base_col].astype(str))
+        # JFILL2 = 'N' — map raw item SKU → base_sku via alias map
+        if not itemstks.empty and "jfill2" in itemstks.columns:
+            jfill2_vals = itemstks["jfill2"].fillna("").astype(str).str.strip().str.upper()
+            raw_jfill2_excluded = set(itemstks.loc[jfill2_vals == "N", "sku"].astype(str))
+            if raw_jfill2_excluded and not items.empty and "sku" in items.columns and "base_sku" in items.columns:
+                sku_to_base = dict(zip(items["sku"].astype(str), items["base_sku"].astype(str)))
+                excluded_skus |= {sku_to_base.get(s, s) for s in raw_jfill2_excluded}
+            else:
+                excluded_skus |= raw_jfill2_excluded
+        if excluded_skus and not sku_metrics.empty and "sku" in sku_metrics.columns:
+            sku_metrics = sku_metrics.loc[~sku_metrics["sku"].astype(str).isin(excluded_skus)].copy()
+    except Exception:
+        pass  # Never let exclusion logic break the dashboard
+    tmark("di_jfill2_exclusion")
+
     summary = _compute_summary_metrics(sku_metrics)
     # Determine stock turn target: use per-CC target if all SKUs share a single CC with a saved target; else default
     stock_turn_target = config.stockturn_target

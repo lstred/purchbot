@@ -121,9 +121,18 @@ ITEMS = dedent(
         [IDELIV]            AS item_lead_time_days,
         [IWIDTH]            AS item_width_inches,
         [IINVEN]            AS inventory_flag,
-        [IIXREF]            AS iixref
+        [IIXREF]            AS iixref,
+        [IPOL1]             AS ipol1,
+        [IPOL2]             AS ipol2,
+        [IPOL3]             AS ipol3
     FROM dbo.ITEM
     WHERE [IINVEN] = 'Y'
+      AND (
+          [IDISCD] IS NULL
+          OR LTRIM(RTRIM([IDISCD])) = ''
+          OR LEN(LTRIM(RTRIM([IDISCD]))) <= 2
+          OR TRY_CONVERT(int, NULLIF(LTRIM(RTRIM([IDISCD])), '')) = 0
+      )
     """
 )
 
@@ -156,7 +165,12 @@ ITEMS_ALL = dedent(
         [IIXREF]            AS iixref,
         [IDISCD]            AS discontinued_flag
     FROM dbo.ITEM
-    WHERE TRY_CONVERT(int, NULLIF(LTRIM(RTRIM([IDISCD])), '')) = 0
+    WHERE (
+        [IDISCD] IS NULL
+        OR LTRIM(RTRIM([IDISCD])) = ''
+        OR LEN(LTRIM(RTRIM([IDISCD]))) <= 2
+        OR TRY_CONVERT(int, NULLIF(LTRIM(RTRIM([IDISCD])), '')) = 0
+    )
     """
 )
 
@@ -177,7 +191,8 @@ ITEMSTK = dedent(
     """
     SELECT
         [ItemNumber] AS sku,
-        TRY_CONVERT(decimal(18, 2), NULLIF(LTRIM(RTRIM([JSTOCK])), '')) AS jstock
+        TRY_CONVERT(decimal(18, 2), NULLIF(LTRIM(RTRIM([JSTOCK])), '')) AS jstock,
+        LTRIM(RTRIM(ISNULL([JFILL2], ''))) AS jfill2
     FROM dbo.ITEMSTK
     """
 )
