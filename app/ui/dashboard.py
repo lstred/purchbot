@@ -29,12 +29,22 @@ try:
     from reportlab.graphics.charts.lineplots import LinePlot
     from reportlab.graphics.charts.barcharts import VerticalBarChart
     from reportlab.graphics import renderPDF
-    import matplotlib
-    matplotlib.use('Agg')  # Non-interactive backend
-    import matplotlib.pyplot as plt
     _HAS_REPORTLAB = True
 except Exception:
     _HAS_REPORTLAB = False
+
+# Matplotlib — set non-interactive backend before any pyplot import.
+# Wrapped separately so a backend-already-set warning doesn't disable PDF support.
+try:
+    import matplotlib
+    try:
+        matplotlib.use('Agg')
+    except Exception:
+        pass  # Backend may already be set by Streamlit; that's fine
+    import matplotlib.pyplot as plt
+    _HAS_MATPLOTLIB = True
+except Exception:
+    _HAS_MATPLOTLIB = False
 
 from app.config import get_config
 from app.data import loaders
@@ -2124,6 +2134,38 @@ def _build() -> None:
                 except Exception:
                     pass
 
+                # Compute the set of over-ordered SKUs using the same logic as the Potential Over-Ordered table
+                _over_ordered_skus: set = set()
+                try:
+                    _oo = df_pdf.copy()
+                    # Pull cover_required_sy from outer-scope sku_metrics (not yet filtered at PDF build time)
+                    if isinstance(sku_metrics, pd.DataFrame) and not sku_metrics.empty and "cover_required_sy" in sku_metrics.columns and "sku" in sku_metrics.columns:
+                        _oo = _oo.merge(sku_metrics[["sku", "cover_required_sy"]].drop_duplicates("sku"), on="sku", how="left")
+                    _inv_oo = pd.to_numeric(_oo.get("inventory_sy"), errors="coerce").fillna(0.0)
+                    _on_order_sy_oo = pd.to_numeric(_oo.get("on_order_sy"), errors="coerce").fillna(0.0)
+                    _po_pending_oo = pd.to_numeric(_oo.get("po_pending_qty"), errors="coerce") if "po_pending_qty" in _oo.columns else None
+                    if isinstance(_po_pending_oo, pd.Series):
+                        _po_pending_oo = _po_pending_oo.fillna(0.0)
+                        _on_order_oo = np.where(_po_pending_oo > 0, _po_pending_oo, _on_order_sy_oo)
+                    else:
+                        _on_order_oo = _on_order_sy_oo.values
+                    _cover_oo = pd.to_numeric(_oo.get("cover_required_sy"), errors="coerce").fillna(0.0)
+                    _backorders_oo = pd.to_numeric(_oo.get("backorder_count"), errors="coerce").fillna(0.0)
+                    _avg_daily_oo = pd.to_numeric(_oo.get("avg_daily_sales_sy"), errors="coerce").fillna(0.0)
+                    _net_inv_oo = _inv_oo + _on_order_oo
+                    _excess_oo = (_net_inv_oo - _cover_oo).clip(lower=0)
+                    _over_amt_oo = np.minimum(_on_order_oo, np.asarray(_excess_oo))
+                    _mask_oo = (
+                        (np.asarray(_on_order_oo) > 0)
+                        & (np.asarray(_backorders_oo) == 0)
+                        & (np.asarray(_avg_daily_oo) > 0)
+                        & (np.asarray(_over_amt_oo) > 0.01)
+                    )
+                    if "sku" in _oo.columns:
+                        _over_ordered_skus = set(_oo.loc[_mask_oo, "sku"].astype(str).str.strip().tolist())
+                except Exception:
+                    _over_ordered_skus = set()
+
                 cols = [
                     ("sku", "sku"),
                     ("desc", "desc"),
@@ -2158,6 +2200,20 @@ def _build() -> None:
                         txt = "Rating thresholds: All SKUs are D (no positive orders in period)."
                     story.append(Paragraph(txt, styles["Normal"]))
                     story.append(Spacer(1, 8))
+                except Exception:
+                    pass
+
+                # Legend
+                try:
+                    legend_parts = [
+                        "Fill% in <font color='red'>red</font>: below rating threshold. ",
+                        "Age(d) shaded pink: &gt; 300 days. ",
+                    ]
+                    if _over_ordered_skus:
+                        legend_parts.append("PO shaded <font color='#CC7A00'>amber</font>: potential over-order.")
+                    from reportlab.platypus import Paragraph as _Para
+                    story.append(_Para(" ".join(legend_parts), styles["Normal"]))
+                    story.append(Spacer(1, 6))
                 except Exception:
                     pass
 
@@ -2284,6 +2340,12 @@ def _build() -> None:
                             # Shade Age(d) cell light red if > 300 days (column index 12)
                             if pd.notna(age_val) and age_val > 300:
                                 red_cmds.append(("BACKGROUND", (12, 1 + i), (12, 1 + i), colors.HexColor("#ffe5e5")))
+                            # Shade PO cell (column index 6) amber if SKU is in the over-ordered set
+                            try:
+                                if str(row.get("sku", "")).strip() in _over_ordered_skus:
+                                    red_cmds.append(("BACKGROUND", (6, 1 + i), (6, 1 + i), colors.HexColor("#FFB347")))
+                            except Exception:
+                                pass
                         # totals row (suppress when there is only one SKU in this price class)
                         if len(grp_sorted.index) > 1:
                             desc_key = str(desc) if pd.notna(desc) else "(No Price Class)"
@@ -11398,10 +11460,15 @@ def _build() -> None:
                 )
                 rep_group["Total"] = rep_group.sum(axis=1)
                 rep_group = rep_group.sort_values("Total", ascending=False)
+                _numeric_cols = [c for c in rep_group.columns if c != "salesperson"]
+                _styled = rep_group.reset_index().style.format("${:,.0f}", subset=_numeric_cols)
+                try:
+                    if _HAS_MATPLOTLIB:
+                        _styled = _styled.background_gradient(cmap="Blues", subset=_numeric_cols)
+                except Exception:
+                    pass  # Skip gradient if matplotlib is unavailable in this context
                 st.dataframe(
-                    rep_group.reset_index().style.format("${:,.0f}", subset=[c for c in rep_group.columns if c != "salesperson"]).background_gradient(
-                        cmap="Blues", subset=[c for c in rep_group.columns if c != "salesperson"]
-                    ),
+                    _styled,
                     use_container_width=True,
                     hide_index=True,
                 )
